@@ -86,7 +86,7 @@ DATABASES = {
 }
 
 '''
-os.environ['data_key'] = 'postgresql://bloomr_database_user:2Ag0kWJATdbWrZ9pkcgIHEWJCwGgkF1A@dpg-d429eq3ipnbc73c5hbmg-a.oregon-postgres.render.com/bloomr_database'
+#os.environ['data_key'] = 'postgresql://bloomr_database_user:2Ag0kWJATdbWrZ9pkcgIHEWJCwGgkF1A@dpg-d429eq3ipnbc73c5hbmg-a.oregon-postgres.render.com/bloomr_database'
 
 DATABASES = {
     'default': dj_database_url.config(
