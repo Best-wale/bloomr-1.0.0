@@ -91,7 +91,7 @@ os.environ['data_key'] = 'postgresql://bloomr_database_user:2Ag0kWJATdbWrZ9pkcgI
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default='postgresql://bloomr_databasev2_user:rpxlGwO1kuiFMYhXL8irg8IioVhz8iFy@dpg-d429ufjuibrs73cqh2pg-a.frankfurt-postgres.render.com/bloomr_databasev2',
+        default='postgresql://bloomr_databasev2_pldv_user:3TXCoRJFiWirqwaTzifX4P2R5VXPulr1@dpg-d42a3njuibrs73cqkuhg-a/bloomr_databasev2_pldv',
          conn_max_age=600
     )
 }
