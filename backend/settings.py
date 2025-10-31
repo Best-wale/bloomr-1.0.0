@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(s2vbitl&1ob)%drre3d+hbn2%231prg7m!lhr22pc57c&n&mo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["dpg-d429eq3ipnbc73c5hbmg-a.oregon-postgres.render.com"]
+ALLOWED_HOSTS = ['127.0.0.1',"bloomr-1-0-0.onrender.com"]
 
 #Custom User 
 AUTH_USER_MODEL = 'core.CustomUser'
