@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Details - Bloomr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        hedera: {
+                            500: '#5D5CDE',
+                            600: '#4B4ABD',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #22c55e 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            border-bottom: 3px solid #22c55e;
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .investment-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .investment-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .investment-option.selected {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'investor-dashboard' %}" class="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        <span class="font-semibold">Back to Dashboard</span>
+                    </a>
+                </div>
+                <a href="index.html" class="flex items-center space-x-2">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-xl font-bold gradient-text">Bloomr</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Farm Header -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+            <!-- Cover Image -->
+            <div class="h-64 bg-gradient-to-r from-primary-500 to-accent-500 relative">
+                <img id="farm-cover" src="{{farm.image.url}}" alt="Farm" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            </div>
+
+            <!-- Farm Info -->
+            <div class="p-6 md:p-8">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h1 class="text-3xl md:text-4xl font-bold" id="farm-name">{{farm.name}}</h1>
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full text-sm font-semibold">
+                                {{farm.status}}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400 mb-4">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span id="farm-location">{{farm.location}}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span id="farm-size">250 acres</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded text-sm font-semibold" id="farm-crop">
+                                   {{farm.crop_type}}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2 text-sm">
+                                <span class="text-gray-500 dark:text-gray-400">Token ID:</span>
+                                <span class="font-mono font-semibold" id="token-id">{{farm.token_id}}</span>
+                                <button onclick="copyTokenId()" class="text-primary-600 hover:text-primary-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                                <a href="#" id="hedera-explorer-link" target="_blank" class="text-hedera-500 hover:text-hedera-600 font-semibold text-sm">
+                                    View on Hedera Explorer ↗
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="showInvestModal()" class="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg">
+                            💰 Invest Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Token Price</div>
+                <div class="text-2xl md:text-3xl font-bold" id="token-price">${{farm.token_price}}</div>
+                <div class="text-green-600 dark:text-green-400 text-sm mt-1">Current</div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Expected ROI</div>
+                <div class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400" id="roi">+28.5%</div>
+                <div class="text-gray-500 dark:text-gray-400 text-sm mt-1">Annually</div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Annual Yield</div>
+                <div class="text-2xl md:text-3xl font-bold" id="yield">150 tons</div>
+                <div class="text-gray-500 dark:text-gray-400 text-sm mt-1">{{farm.crop_type}}</div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Funding</div>
+                <div class="text-2xl md:text-3xl font-bold" id="funding">{{farm.raised_in_cent}}%</div>
+                <div class="text-gray-500 dark:text-gray-400 text-sm mt-1">${{farm.raised}} raised</div>
+            </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <!-- Tab Headers -->
+            <div class="border-b border-gray-200 dark:border-gray-700">
+                <div class="flex overflow-x-auto">
+                    <button class="tab-button active px-6 py-4 whitespace-nowrap" onclick="showTab('overview')">
+                        Overview
+                    </button>
+                    <button class="tab-button px-6 py-4 whitespace-nowrap" onclick="showTab('performance')">
+                        Performance
+                    </button>
+                    <button class="tab-button px-6 py-4 whitespace-nowrap" onclick="showTab('updates')">
+                        Updates
+                    </button>
+                    <button class="tab-button px-6 py-4 whitespace-nowrap" onclick="showTab('investors')">
+                        Investors
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6 md:p-8">
+                <!-- Overview Tab -->
+                <div id="tab-overview" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Farm Overview</h2>
+
+                    <!-- Description -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-3">About This Farm</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed" id="farm-description">
+                            Green Valley Coffee Farm is a premium coffee estate located in the highlands of Kenya. With over 250 acres of arabica coffee plants, we produce some of the finest specialty coffee in East Africa. Our farm has been in operation for over 30 years and is committed to sustainable farming practices and fair trade principles.
+                        </p>
+                    </div>
+
+                    <!-- Funding Progress -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold">Investment Progress</h3>
+                            <span class="text-2xl font-bold text-primary-600">{{farm.raised_in_cent}}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-2">
+                            <div class="bg-gradient-to-r from-primary-500 to-accent-500 h-4 rounded-full transition-all" style="width:{{farm.raised_in_cent}}0%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                            <span>${{farm.raised}} raised</span>
+                            <span>${{farm.valuation}} goal</span>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Farm Details</h3>
+                            <dl class="space-y-3">
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Established</dt>
+                                    <dd class="font-semibold">1992</dd>
+                                </div>
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Annual Yield</dt>
+                                    <dd class="font-semibold">150 tons</dd>
+                                </div>
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Harvest Season</dt>
+                                    <dd class="font-semibold">Oct - Dec</dd>
+                                </div>
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Certifications</dt>
+                                    <dd class="font-semibold">Organic, Fair Trade</dd>
+                                </div>
+                            </dl>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Investment Details</h3>
+                            <dl class="space-y-3">
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Min Investment</dt>
+                                    <dd class="font-semibold">$125 (1 token)</dd>
+                                </div>
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Total Supply</dt>
+                                    <dd class="font-semibold">2,000 tokens</dd>
+                                </div>
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Tokens Available</dt>
+                                    <dd class="font-semibold">300 (15%)</dd>
+                                </div>
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-600 dark:text-gray-400">Expected Returns</dt>
+                                    <dd class="font-semibold text-green-600 dark:text-green-400">18-32% annually</dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Tab -->
+                <div id="tab-performance" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Performance & Analytics</h2>
+
+                    <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                        <!-- ROI Chart -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">ROI Projection (12 months)</h3>
+                            <canvas id="roi-chart"></canvas>
+                        </div>
+
+                        <!-- Price History Chart -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Token Price History</h3>
+                            <canvas id="price-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Performance Metrics -->
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Current Harvest</div>
+                            <div class="text-3xl font-bold mb-1">145 tons</div>
+                            <div class="text-green-600 dark:text-green-400 text-sm">+12% vs last year</div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Market Price</div>
+                            <div class="text-3xl font-bold mb-1">$4.80/kg</div>
+                            <div class="text-green-600 dark:text-green-400 text-sm">+8% this month</div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Est. Revenue</div>
+                            <div class="text-3xl font-bold mb-1">$696K</div>
+                            <div class="text-green-600 dark:text-green-400 text-sm">This harvest</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Updates Tab -->
+                <div id="tab-updates" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Farm Updates</h2>
+                    <div class="space-y-6" id="updates-feed">
+                        <!-- Updates will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Investors Tab -->
+                <div id="tab-investors" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Current Investors</h2>
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                <span class="font-semibold">Total Investors: <span class="text-primary-600">45</span></span>
+                            </div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">1,700 tokens distributed</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4" id="investors-list">
+                        <!-- Investors will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Investment Modal -->
+    <div id="invest-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold">Invest in Green Valley Coffee</h3>
+                <button onclick="closeInvestModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="invest-form" class="space-y-6">
+                <!-- Quick Investment Options -->
+                <div>
+                    <label class="block text-sm font-semibold mb-3">Quick Select</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="investment-option border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center" onclick="selectInvestment({{farm.token_price}}, 10)">
+                            <div class="text-2xl font-bold text-primary-600">${{farm.token_price}}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">1 tokens</div>
+                        </div>
+                        <div class="investment-option border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center" onclick="selectInvestment(2*{{farm.token_price}}, 20)">
+                            <div class="text-2xl font-bold text-primary-600">${{farm.token_price}}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">2 tokens</div>
+                        </div>
+                        <div class="investment-option border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center" onclick="selectInvestment(6250, 50)">
+                            <div class="text-2xl font-bold text-primary-600">$6,250</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">5 tokens</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div>
+                    <label class="block text-sm font-semibold mb-3">Payment Method</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="investment-option selected border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4" onclick="selectPaymentMethod('usd', event)">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold">USD</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="investment-option border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4" onclick="selectPaymentMethod('hbar', event)">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-6 h-6 text-hedera-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"></path>
+                                    </svg>
+                                    <span class="font-semibold">HBAR</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="payment-method" name="payment_method" value="usd">
+                </div>
+
+                <!-- Custom Amount -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Investment Amount</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold" id="currency-symbol">$</span>
+                        <input
+                            type="number"
+                            id="invest-amount"
+                            name="amount"
+                            class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            placeholder="1250"
+                            min="125"
+                            step="125"
+                            required
+                            oninput="calculateTokens()"
+                        >
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Minimum investment: $125 (1 token)</p>
+                </div>
+
+                <!-- Tokens Calculation -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600 dark:text-gray-400">You will receive:</span>
+                        <span class="text-2xl font-bold text-primary-600" id="tokens-display">0 tokens</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Token Price:</span>
+                        <span class="font-semibold">$125 per token</span>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h4 class="font-semibold mb-3">Investment Summary</h4>
+                    <dl class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600 dark:text-gray-400">Farm</dt>
+                            <dd class="font-semibold">Green Valley Coffee</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600 dark:text-gray-400">Expected Annual ROI</dt>
+                            <dd class="font-semibold text-green-600 dark:text-green-400">+28.5%</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600 dark:text-gray-400">Estimated Returns (1 year)</dt>
+                            <dd class="font-semibold text-green-600 dark:text-green-400" id="estimated-returns">$0</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <!-- Terms -->
+                <div class="flex items-start">
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        name="terms"
+                        class="mt-1 w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                        required
+                    >
+                    <label for="terms" class="ml-3 text-sm text-gray-600 dark:text-gray-400">
+                        I understand the risks involved in agricultural investments and agree to the <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold">Terms & Conditions</a>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" onclick="closeInvestModal()" class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        id="invest-btn"
+                        class="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold transition-all hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span id="invest-text">Complete Investment</span>
+                        <span id="invest-loading" class="hidden">Processing...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        // Cookie helpers
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+        }
+
+        // Dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Get farm slug from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const farmid = urlParams.get('id');
+
+        // Show/hide tabs
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tabName === 'performance') {
+                setTimeout(initCharts, 100);
+            }
+        }
+
+        // Copy token ID
+        function copyTokenId() {
+            const tokenId = document.getElementById('token-id').textContent;
+            navigator.clipboard.writeText(tokenId).then(() => {
+                const msg = document.createElement('div');
+                msg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                msg.textContent = 'Token ID copied!';
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 2000);
+            });
+        }
+
+        // Investment modal
+        function showInvestModal() {
+            document.getElementById('invest-modal').classList.remove('hidden');
+        }
+
+        function closeInvestModal() {
+            document.getElementById('invest-modal').classList.add('hidden');
+        }
+
+        function selectInvestment(amount, tokens) {
+            document.getElementById('invest-amount').value = amount;
+            calculateTokens();
+
+            document.querySelectorAll('.investment-option').forEach(opt => {
+                if (opt.onclick && opt.onclick.toString().includes(`${amount}, ${tokens}`)) {
+                    opt.classList.add('selected');
+                } else if (!opt.onclick || !opt.onclick.toString().includes('selectPaymentMethod')) {
+                    opt.classList.remove('selected');
+                }
+            });
+        }
+
+        function selectPaymentMethod(method, event) {
+            document.getElementById('payment-method').value = method;
+            document.getElementById('currency-symbol').textContent = method === 'usd' ? '$' : 'ℏ';
+
+            const options = event.currentTarget.parentElement.querySelectorAll('.investment-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function calculateTokens() {
+            const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
+            const tokenPrice = 125;
+            const tokens = Math.floor(amount / tokenPrice);
+            const roi = 0.285;
+
+            document.getElementById('tokens-display').textContent = tokens + ' tokens';
+            document.getElementById('estimated-returns').textContent = '$' + (amount * roi).toFixed(2);
+        }
+
+
+        // Invest form submission
+        document.getElementById('invest-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('invest-btn');
+    const btnText = document.getElementById('invest-text');
+    const btnLoading = document.getElementById('invest-loading');
+
+    btn.disabled = true;
+    btnText.classList.add('hidden');
+    btnLoading.classList.remove('hidden');
+
+    const token = localStorage.getItem("bloomr_token");
+    const apiUrl = '/api/investments/';
+    
+    const formData = {
+        farm: {{ farm.id }},
+        tokens: 4,
+        currentValue: 1000,
+        invested: document.getElementById('invest-amount').value,
+        roi: '100',
+        payment_method: document.getElementById('payment-method').value,
+        transaction_hash: "jsndksjd"
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Investment failed');
+        }
+
+        const data = await response.json();
+        closeInvestModal();
+        showSuccessModal(data.transaction_id, data.tokens);
+
+    } catch (error) {
+        const msg = document.createElement('div');
+        msg.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        msg.textContent = error.message;
+        document.body.appendChild(msg);
+        setTimeout(() => msg.remove(), 3000);
+    } finally {
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnLoading.classList.add('hidden');
+    }
+});
+
+        function showSuccessModal(txId, tokens) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Investment Successful! 🎉</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">You now own ${tokens} tokens in this farm</p>
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4 text-left">
+                            <p class="text-xs text-gray-500 mb-1">Transaction ID</p>
+                            <p class="font-mono text-sm font-semibold break-all">${txId}</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="window.location.href='investor-dashboard.html'" class="flex-1 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold">
+                                View Portfolio
+                            </button>
+                            <button onclick="this.closest('.fixed').remove()" class="flex-1 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Load updates
+        function loadUpdates() {
+            const mockUpdates = [
+                { title: 'Harvest Season Begins!', message: 'We are excited to announce that harvest season has officially begun. Our team is working around the clock to ensure the best quality beans are collected.', date: '2 days ago', image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop' },
+                { title: 'New Processing Equipment', message: 'We have invested in new coffee processing equipment that will improve both quality and efficiency.', date: '1 week ago', image: null },
+                { title: 'Quality Certification Renewed', message: 'Great news! Our farm has renewed its organic and fair trade certifications for another year.', date: '2 weeks ago', image: null }
+            ];
+
+            const updatesHtml = mockUpdates.map(update => `
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-xl font-bold">${update.title}</h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">${update.date}</span>
+                    </div>
+                    ${update.image ? `<img src="${update.image}" alt="${update.title}" class="w-full h-48 object-cover rounded-lg mb-4">` : ''}
+                    <p class="text-gray-600 dark:text-gray-400">${update.message}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('updates-feed').innerHTML = updatesHtml;
+        }
+
+        // Load investors
+        function loadInvestors() {
+            const mockInvestors = [
+                { name: 'Alice Johnson', wallet: '0x1234...5678', tokens: 250, percentage: 12.5 },
+                { name: 'Bob Smith', wallet: '0x8765...4321', tokens: 180, percentage: 9.0 },
+                { name: 'Carol White', wallet: '0x5555...9999', tokens: 150, percentage: 7.5 }
+            ];
+
+            const investorsHtml = mockInvestors.map(investor => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            ${investor.name.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="font-semibold">${investor.name}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 font-mono">${investor.wallet}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold">${investor.tokens} tokens</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">${investor.percentage}%</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('investors-list').innerHTML = investorsHtml;
+        }
+
+        // Charts
+        function initCharts() {
+            // ROI Chart
+            const roiCtx = document.getElementById('roi-chart');
+            if (roiCtx && !roiCtx.chart) {
+                roiCtx.chart = new Chart(roiCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'ROI %',
+                            data: [5, 8, 12, 15, 18, 20, 22, 24, 26, 27, 28, 28.5],
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Price Chart
+            const priceCtx = document.getElementById('price-chart');
+            if (priceCtx && !priceCtx.chart) {
+                priceCtx.chart = new Chart(priceCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Token Price',
+                            data: [100, 105, 110, 115, 120, 125],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Set Hedera explorer link
+        const tokenId = document.getElementById('token-id').textContent;
+        document.getElementById('hedera-explorer-link').href = `https://hashscan.io/mainnet/token/${tokenId}`;
+
+        // Initialize
+        loadUpdates();
+        loadInvestors();
+    </script>
+</body>
+</html>

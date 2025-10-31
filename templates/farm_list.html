@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>Farms</title></head>
+<body>
+  <h1>🌾 Available Farms</h1>
+  <a href="/app/create/">+ Add New Farm</a>
+  <ul>
+  {% for farm in farms %}
+    <li>{{ farm.farm_name }} ({{ farm.location }})</li>
+  {% empty %}
+    <li>No farms yet.</li>
+  {% endfor %}
+  </ul>
+</body>
+</html>

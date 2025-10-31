@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloomr - Tokenize African Farms | Invest in Real Agriculture</title>
+    <meta name="description" content="Empowering African farmers by tokenizing real farms as on-chain assets. Invest safely via Hedera and track yield in real time.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        hedera: {
+                            500: '#5D5CDE',
+                            600: '#4B4ABD',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'float-delayed': 'float 3s ease-in-out 0.5s infinite',
+                        'float-slow': 'float 4s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'scale-in': 'scaleIn 0.5s ease-out',
+                        'counter': 'counter 2s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles */
+        .gradient-bg {
+            background: linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%);
+        }
+
+        .gradient-accent {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .glass-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .token-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #22c55e 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animated background particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: particle-float 20s infinite;
+        }
+
+        @keyframes particle-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, -100px) scale(1.2); }
+            66% { transform: translate(-50px, -150px) scale(0.8); }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-2xl font-bold gradient-text">Bloomr</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#how-it-works" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition">How It Works</a>
+                    <a href="#farms" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition">Top Farms</a>
+                    <a href="#about" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition">About</a>
+                    <a href="{% url 'login' %}" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-full font-semibold transition-all hover:scale-105">
+                        Sign In
+                    </a>
+                    <button onclick="scrollToSignup()" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-semibold transition-all hover:scale-105">
+                        Get Started
+                    </button>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden fixed top-16 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-40 md:hidden">
+        <div class="px-4 py-4 space-y-3">
+            <a href="#how-it-works" class="block text-gray-700 dark:text-gray-300 hover:text-primary-600 py-2">How It Works</a>
+            <a href="#farms" class="block text-gray-700 dark:text-gray-300 hover:text-primary-600 py-2">Top Farms</a>
+            <a href="#about" class="block text-gray-700 dark:text-gray-300 hover:text-primary-600 py-2">About</a>
+<a href="{% url 'login' %}" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-full font-semibold transition-all hover:scale-105">
+                        Sign In
+                    </a>
+            <button onclick="scrollToSignup()" class="w-full px-6 py-2 bg-primary-600 text-white rounded-full font-semibold">
+                Get Started
+            </button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 gradient-bg">
+            <!-- Particles -->
+            <div class="particle w-64 h-64 bg-accent-500" style="top: 10%; left: 10%;"></div>
+            <div class="particle w-96 h-96 bg-primary-400" style="top: 50%; right: 15%; animation-delay: 3s;"></div>
+            <div class="particle w-48 h-48 bg-yellow-400" style="bottom: 20%; left: 60%; animation-delay: 6s;"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Left Column: Text Content -->
+                <div class="text-white space-y-8">
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-slide-up">
+                        Grow Your Wealth with
+                        <span class="block text-accent-500">African Agriculture</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-100 animate-fade-in">
+                        Empowering African farmers by tokenizing real farms as on-chain assets.
+                        Invest safely via Hedera and track yield in real time.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 animate-scale-in">
+                        <button onclick="scrollToSignup()" class="px-8 py-4 bg-accent-500 hover:bg-accent-600 text-white rounded-full font-bold text-lg transition-all hover:scale-105 shadow-2xl">
+                            Start Tokenizing →
+                        </button>
+                        <button onclick="document.getElementById('how-it-works').scrollIntoView({behavior: 'smooth'})" class="px-8 py-4 glass-card text-white rounded-full font-bold text-lg transition-all hover:scale-105">
+                            Learn More
+                        </button>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="flex flex-wrap items-center gap-6 pt-8">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-6 h-6 text-accent-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-semibold">Hedera Verified</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-6 h-6 text-accent-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-semibold">Secure & Transparent</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-6 h-6 text-accent-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                            <span class="text-sm font-semibold">Real-Time Tracking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Animated Farm Tokens -->
+                <div class="relative h-96 md:h-[500px]">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <!-- Central Farm Icon -->
+                        <div class="relative z-10 bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl">
+                            <svg class="w-32 h-32 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                        </div>
+
+                        <!-- Floating Token 1 -->
+                        <div class="absolute top-0 left-1/4 animate-float glass-card rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-accent-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">T</span>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">Token</div>
+                                    <div class="font-bold text-white">$245</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Token 2 -->
+                        <div class="absolute top-1/4 right-0 animate-float-delayed glass-card rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">T</span>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">ROI</div>
+                                    <div class="font-bold text-green-400">+18.5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Token 3 -->
+                        <div class="absolute bottom-1/4 left-0 animate-float-slow glass-card rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">Yield</div>
+                                    <div class="font-bold text-white">2.4T</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Token 4 -->
+                        <div class="absolute bottom-0 right-1/4 animate-float glass-card rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-hedera-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">H</span>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">Hedera</div>
+                                    <div class="font-bold text-white">Verified</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Live Stats Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center animate-on-scroll">
+                    <div class="text-4xl md:text-5xl font-bold gradient-text mb-2" data-counter="1247">0</div>
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold">Active Farms</div>
+                </div>
+                <div class="text-center animate-on-scroll">
+                    <div class="text-4xl md:text-5xl font-bold gradient-text mb-2">$<span data-counter="8.4">0</span>M</div>
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold">Total Invested</div>
+                </div>
+                <div class="text-center animate-on-scroll">
+                    <div class="text-4xl md:text-5xl font-bold gradient-text mb-2" data-counter="15623">0</div>
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold">Investors</div>
+                </div>
+                <div class="text-center animate-on-scroll">
+                    <div class="text-4xl md:text-5xl font-bold gradient-text mb-2"><span data-counter="23.5">0</span>%</div>
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold">Avg. ROI</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">How Bloomr Works</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+                    Three simple steps to start investing in real African agriculture with blockchain security
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="relative animate-on-scroll hover-lift bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+                    <div class="absolute -top-6 left-8 w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        1
+                    </div>
+                    <div class="mt-6">
+                        <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Browse Farms</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            Explore verified African farms with detailed metrics, historical performance, and real-time updates. Each farm is vetted and tokenized on Hedera.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative animate-on-scroll hover-lift bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg" style="animation-delay: 0.1s;">
+                    <div class="absolute -top-6 left-8 w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        2
+                    </div>
+                    <div class="mt-6">
+                        <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Buy Tokens</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            Purchase fractional ownership through farm tokens. Invest as little as $10 and own a piece of real agricultural production secured on-chain.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative animate-on-scroll hover-lift bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg" style="animation-delay: 0.2s;">
+                    <div class="absolute -top-6 left-8 w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        3
+                    </div>
+                    <div class="mt-6">
+                        <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Track & Earn</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            Monitor your investment in real-time with live yield data, weather updates, and harvest forecasts. Earn returns as farms produce and sell crops.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Performing Farms Section -->
+    <section id="farms" class="py-20 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Top Performing Farms</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-400">
+                    Discover high-yield opportunities across Africa
+                </p>
+            </div>
+
+            <div id="farms-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Farm cards will be inserted here by JavaScript -->
+            </div>
+
+            <div class="text-center mt-12">
+                <button onclick="scrollToSignup()" class="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-bold text-lg transition-all hover:scale-105 shadow-lg">
+                    View All Farms →
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 gradient-bg opacity-95"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 animate-on-scroll">
+                Ready to Grow Your Portfolio?
+            </h2>
+            <p class="text-xl md:text-2xl mb-8 animate-on-scroll">
+                Join thousands of investors supporting African agriculture and earning sustainable returns
+            </p>
+            <div id="signup-section" class="max-w-md mx-auto animate-on-scroll">
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+                    <h3 class="text-2xl font-bold mb-6">Get Early Access</h3>
+                    <form id="signup-form" class="space-y-4">
+                        <input
+                            type="text"
+                            id="name-input"
+                            placeholder="Full Name"
+                            class="w-full px-4 py-3 rounded-lg bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-500"
+                            required
+                        >
+                        <input
+                            type="email"
+                            id="email-input"
+                            placeholder="Email Address"
+                            class="w-full px-4 py-3 rounded-lg bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white text-base border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-accent-500"
+                            required
+                        >
+                        <button
+                            type="submit"
+                            class="w-full px-8 py-4 bg-accent-500 hover:bg-accent-600 text-white rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-xl"
+                        >
+                            Start Tokenizing →
+                        </button>
+                    </form>
+                    <p class="text-sm text-gray-200 mt-4">No credit card required • Get started in 2 minutes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="about" class="bg-gray-900 text-gray-300 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <!-- Brand -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <svg class="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-2xl font-bold text-white">Bloomr</span>
+                    </div>
+                    <p class="text-gray-400 mb-4 max-w-md">
+                        Empowering African farmers and investors through blockchain technology.
+                        Making agriculture investment accessible, transparent, and profitable for everyone.
+                    </p>
+                    <div class="flex items-center space-x-2 bg-hedera-500/20 border border-hedera-500 rounded-lg px-4 py-2 inline-flex">
+                        <svg class="w-6 h-6 text-hedera-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path>
+                        </svg>
+                        <span class="text-sm font-semibold text-white">Secured by Hedera</span>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-bold text-white mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#how-it-works" class="hover:text-primary-400 transition">How It Works</a></li>
+                        <li><a href="#farms" class="hover:text-primary-400 transition">Browse Farms</a></li>
+                        <li><a href="#" class="hover:text-primary-400 transition">About Us</a></li>
+                        <li class="relative flex items-center space-x-2 group">
+  <a href="#" class="hover:text-primary-400 transition flex items-center space-x-2">
+    <span>Mobile App</span>
+    <span class="ml-2 text-[10px] font-medium text-gray-400 border border-gray-300 dark:border-gray-600 px-2 py-[1px] rounded-full group-hover:text-primary-400 transition">
+      Coming Soon
+    </span>
+  </a>
+</li>
+                        <li><a href="#" class="hover:text-primary-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-bold text-white mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                            </svg>
+                            <a href="mailto:hello@bloomr.africa" class="hover:text-primary-400 transition">hello@bloomr.africa</a>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>Lagos, Nigeria</span>
+                        </li>
+                        <li class="flex items-center space-x-4 pt-2">
+                            <a href="#" class="hover:text-primary-400 transition">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-primary-400 transition">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="hover:text-primary-400 transition">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z" clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2024 Bloomr. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-sm hover:text-primary-400 transition">Privacy Policy</a>
+                    <a href="#" class="text-sm hover:text-primary-400 transition">Terms of Service</a>
+                    <a href="#" class="text-sm hover:text-primary-400 transition">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl animate-scale-in">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Welcome to Bloomr! 🌱</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    You're on the waitlist! We'll send you exclusive early access details soon.
+                </p>
+                <button onclick="closeModal()" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all hover:scale-105 w-full">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Scroll to signup
+        function scrollToSignup() {
+             window.location.href = "{% url 'register' %}"
+            //document.getElementById('signup-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Counter animation
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = Math.ceil(target).toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.ceil(current).toLocaleString();
+                }
+            }, 16);
+        }
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Trigger counter animations
+                    const counter = entry.target.querySelector('[data-counter]');
+                    if (counter && !counter.classList.contains('animated')) {
+                        counter.classList.add('animated');
+                        const target = parseFloat(counter.getAttribute('data-counter'));
+                        animateCounter(counter, target);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+        // Fetch and display stats (mock data for now)
+        async function fetchStats() {
+            // Simulated API call - replace with actual API endpoint
+            // const response = await fetch('/api/stats/');
+            // const data = await response.json();
+
+            // Mock data
+            const stats = {
+                activeFarms: 1247,
+                totalInvested: 8.4,
+                investors: 15623,
+                avgROI: 23.5
+            };
+
+            // Stats are animated via counter animation on scroll
+        }
+
+        // Fetch and display top farms (mock data for now)
+        async function fetchTopFarms() {
+            // Simulated API call - replace with actual API endpoint
+            // const response = await fetch('/api/farms/?sort=roi');
+            // const data = await response.json();
+
+            // Mock data
+            const farms = [
+                {
+                    id: 1,
+                    name: "Serengeti Coffee Estate",
+                    location: "Tanzania",
+                    crop: "Coffee",
+                    roi: 28.5,
+                    totalValue: 245000,
+                    tokenPrice: 125,
+                    image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop"
+                },
+                {
+                    id: 2,
+                    name: "Sahel Maize Cooperative",
+                    location: "Senegal",
+                    crop: "Maize",
+                    roi: 24.2,
+                    totalValue: 180000,
+                    tokenPrice: 89,
+                    image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop"
+                },
+                {
+                    id: 3,
+                    name: "Victoria Rice Fields",
+                    location: "Uganda",
+                    crop: "Rice",
+                    roi: 22.8,
+                    totalValue: 320000,
+                    tokenPrice: 156,
+                    image: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=400&h=300&fit=crop"
+                },
+                {
+                    id: 4,
+                    name: "Kilimanjaro Avocado Farm",
+                    location: "Kenya",
+                    crop: "Avocado",
+                    roi: 21.5,
+                    totalValue: 410000,
+                    tokenPrice: 198,
+                    image: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=400&h=300&fit=crop"
+                },
+                {
+                    id: 5,
+                    name: "Zambezi Wheat Collective",
+                    location: "Zambia",
+                    crop: "Wheat",
+                    roi: 20.1,
+                    totalValue: 275000,
+                    tokenPrice: 142,
+                    image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop"
+                },
+                {
+                    id: 6,
+                    name: "Atlas Olive Grove",
+                    location: "Morocco",
+                    crop: "Olives",
+                    roi: 19.7,
+                    totalValue: 195000,
+                    tokenPrice: 95,
+                    image: "https://images.unsplash.com/photo-1474440692490-2e83ae13ba29?w=400&h=300&fit=crop"
+                }
+            ];
+
+            const container = document.getElementById('farms-container');
+            container.innerHTML = farms.map((farm, index) => `
+                <div class="animate-on-scroll hover-lift bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg" style="animation-delay: ${index * 0.1}s;">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${farm.image}" alt="${farm.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                        <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            +${farm.roi}% ROI
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="text-xl font-bold">${farm.name}</h3>
+                        </div>
+                        <div class="flex items-center text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${farm.location}
+                            <span class="mx-2">•</span>
+                            <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded text-xs font-semibold">
+                                ${farm.crop}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Token Price</div>
+                                <div class="text-lg font-bold">$${farm.tokenPrice}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Total Value</div>
+                                <div class="text-lg font-bold">$${(farm.totalValue / 1000).toFixed(0)}K</div>
+                            </div>
+                        </div>
+                        <button onclick="scrollToSignup()" class="w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all hover:scale-105">
+                            Invest Now
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Re-observe new elements
+            document.querySelectorAll('#farms-container .animate-on-scroll').forEach(el => observer.observe(el));
+        }
+
+        // Form submission
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name-input').value;
+            const email = document.getElementById('email-input').value;
+
+            // Here you would typically send this to your backend
+            console.log('Signup:', { name, email });
+
+            // Show success modal
+            document.getElementById('success-modal').classList.remove('hidden');
+
+            // Reset form
+            this.reset();
+        });
+
+        function closeModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('success-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Initialize
+        fetchStats();
+        fetchTopFarms();
+    </script>
+</body>
+</html>

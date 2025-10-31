@@ -1,0 +1,1554 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Farmer Dashboard - Bloomr</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: {
+                                50: "#f0fdf4",
+                                100: "#dcfce7",
+                                200: "#bbf7d0",
+                                300: "#86efac",
+                                400: "#4ade80",
+                                500: "#22c55e",
+                                600: "#16a34a",
+                                700: "#15803d",
+                                800: "#166534",
+                                900: "#14532d",
+                            },
+                            accent: {
+                                500: "#f59e0b",
+                                600: "#d97706",
+                            },
+                            hedera: {
+                                500: "#5D5CDE",
+                                600: "#4B4ABD",
+                            },
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .gradient-text {
+                background: linear-gradient(135deg, #22c55e 0%, #f59e0b 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hover-lift {
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+            }
+
+            .hover-lift:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            .sidebar-link {
+                transition: all 0.3s ease;
+            }
+
+            .sidebar-link:hover {
+                background: rgba(34, 197, 94, 0.1);
+                border-left: 4px solid #22c55e;
+                padding-left: 1.25rem;
+            }
+
+            .sidebar-link.active {
+                background: rgba(34, 197, 94, 0.15);
+                border-left: 4px solid #22c55e;
+                padding-left: 1.25rem;
+                font-weight: 600;
+            }
+
+            @media (max-width: 768px) {
+                .sidebar {
+                    transform: translateX(-100%);
+                    transition: transform 0.3s ease;
+                }
+                .sidebar.open {
+                    transform: translateX(0);
+                }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <!-- Mobile Menu Overlay -->
+        <div
+            id="overlay"
+            class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onclick="toggleSidebar()"
+        ></div>
+
+        <!-- Sidebar -->
+        <aside
+            id="sidebar"
+            class="sidebar fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl z-50 overflow-y-auto"
+        >
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <svg
+                        class="w-8 h-8 text-primary-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                    </svg>
+                    <span class="text-xl font-bold gradient-text">Bloomr</span>
+                </a>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Farmer Dashboard
+                </p>
+            </div>
+
+            <!-- User Info -->
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div
+                        id="user-avatar"
+                        class="w-12 h-12 bg-gradient-to-br from-accent-500 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg animate-pulse"
+                    >
+                        <span id="user-initials" class="opacity-0">--</span>
+                    </div>
+                    <div class="flex-1">
+                        <p
+                            id="user-name"
+                            class="font-semibold text-sm text-transparent bg-gray-300 dark:bg-gray-700 rounded w-24 h-4 animate-pulse"
+                        ></p>
+                        <p
+                            id="user-email"
+                            class="text-xs text-transparent bg-gray-200 dark:bg-gray-700 rounded w-32 h-3 mt-1 animate-pulse"
+                        ></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a
+                            href="#"
+                            class="sidebar-link active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300"
+                            onclick="showView('overview'); return false;"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                ></path>
+                            </svg>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300"
+                            onclick="showView('my-farms'); return false;"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                ></path>
+                            </svg>
+                            <span>My Farms</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300"
+                            onclick="showView('add-farm'); return false;"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4v16m8-8H4"
+                                ></path>
+                            </svg>
+                            <span>Add New Farm</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300"
+                            onclick="showView('transactions'); return false;"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                ></path>
+                            </svg>
+                            <span>Transactions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                ></path>
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                ></path>
+                            </svg>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout -->
+            <div
+                class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+            >
+                <button
+                    onclick="logout()"
+                    class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-all"
+                >
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        ></path>
+                    </svg>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="md:ml-64 min-h-screen">
+            <!-- Top Bar -->
+            <header
+                class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30"
+            >
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center space-x-4">
+                        <button
+                            onclick="toggleSidebar()"
+                            class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                ></path>
+                            </svg>
+                        </button>
+                        <h1 class="text-2xl font-bold" id="page-title">
+                            Overview
+                        </h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Wallet Badge -->
+                        <div
+                            id="wallet-badge"
+                            class="hidden md:flex items-center space-x-2 bg-hedera-500/20 border border-hedera-500 rounded-lg px-3 py-2 animate-pulse"
+                        >
+                            <svg
+                                class="w-5 h-5 text-hedera-500"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+                                ></path>
+                            </svg>
+
+                            <!-- Placeholder (hidden after load) -->
+                            <span
+                                id="wallet-address-short"
+                                class="text-xs font-mono text-gray-400 bg-gray-200 dark:bg-gray-700 rounded w-20 h-3 block"
+                            ></span>
+                        </div>
+                        <!-- Notifications -->
+                        <button
+                            class="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                                ></path>
+                            </svg>
+                            <span
+                                class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"
+                            ></span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="p-4 md:p-8">
+                <!-- Overview View -->
+                <div id="view-overview" class="view-content">
+                    <!-- Stats Cards -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                    >
+                        <!-- Farms Listed -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift"
+                        >
+                            <div class="flex items-center justify-between mb-4">
+                                <div
+                                    class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center"
+                                >
+                                    <!-- SVG Icon -->
+                                    <svg
+                                        class="w-6 h-6 text-primary-600 dark:text-primary-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <span
+                                    class="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-full"
+                                >
+                                    +2 this month
+                                </span>
+                            </div>
+                            <h3
+                                class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1"
+                            >
+                                Farms Listed
+                            </h3>
+                            <p class="text-3xl font-bold " id="stat-farms"></p>
+                            <div
+                                class="font-semibold text-sm text-transparent bg-gray-300 dark:bg-gray-700 rounded w-24 h-4 animate-pulse"
+                                id="placeholder-farms"
+                            ></div>
+                        </div>
+
+                        <!-- Total Raised -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift"
+                        >
+                            <div class="flex items-center justify-between mb-4">
+                                <div
+                                    class="w-12 h-12 bg-accent-100 dark:bg-accent-900 rounded-lg flex items-center justify-center"
+                                >
+                                    <!-- SVG Icon -->
+                                    <svg
+                                        class="w-6 h-6 text-accent-600 dark:text-accent-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <span
+                                    class="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-full"
+                                >
+                                    +18.5%
+                                </span>
+                            </div>
+                            <h3
+                                class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1"
+                            >
+                                Total Raised
+                            </h3>
+                            <p class="text-3xl font-bold" id="stat-raised">
+                                
+                            </p>
+                            <div
+                                class="font-semibold text-sm text-transparent bg-gray-300 dark:bg-gray-700 rounded w-24 h-4 animate-pulse"
+                                id="placeholder-raised"
+                            ></div>
+                        </div>
+
+                        <!-- Pending Approvals -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift"
+                        >
+                            <div class="flex items-center justify-between mb-4">
+                                <div
+                                    class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center"
+                                >
+                                    <!-- SVG Icon -->
+                                    <svg
+                                        class="w-6 h-6 text-yellow-600 dark:text-yellow-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <h3
+                                class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1"
+                            >
+                                Pending Approvals
+                            </h3>
+                            <p class="text-3xl font-bold" id="stat-pending">
+                              
+                            </p>
+                            <div
+                                class="font-semibold text-sm text-transparent bg-gray-300 dark:bg-gray-700 rounded w-24 h-4 animate-pulse"
+                                id="placeholder-pending"
+                            ></div>
+                        </div>
+
+                        <!-- Total Investors -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift"
+                        >
+                            <div class="flex items-center justify-between mb-4">
+                                <div
+                                    class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"
+                                >
+                                    <!-- SVG Icon -->
+                                    <svg
+                                        class="w-6 h-6 text-blue-600 dark:text-blue-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <span
+                                    class="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-full"
+                                >
+                                    +24
+                                </span>
+                            </div>
+                            <h3
+                                class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1"
+                            >
+                                Total Investors
+                            </h3>
+                            <p class="text-3xl font-bold" id="stat-investors">
+                                
+                            </p>
+                            <div
+                                class="font-semibold text-sm text-transparent bg-gray-300 dark:bg-gray-700 rounded w-24 h-4 animate-pulse"
+                                id="placeholder-investors"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Recent Transactions -->
+                        <div class="lg:col-span-2">
+                            <div
+                                class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+                            >
+                                <div
+                                    class="flex items-center justify-between mb-6"
+                                >
+                                    <h2 class="text-xl font-bold">
+                                        Recent Transactions
+                                    </h2>
+                                    <button
+                                        class="text-sm text-primary-600 hover:text-primary-700 font-semibold"
+                                    >
+                                        View All
+                                    </button>
+                                </div>
+                                <div id="transactions-feed" class="space-y-4">
+                                    <!-- Transactions will be loaded here -->
+                                    <div
+                                        class="flex items-center justify-center py-8 text-gray-500"
+                                    >
+                                        <div
+                                            class="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="space-y-6">
+                            <div
+                                class="bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl shadow-lg p-6 text-white"
+                            >
+                                <h3 class="text-xl font-bold mb-4">
+                                    Quick Actions
+                                </h3>
+                                <div class="space-y-3">
+                                    <button
+                                        onclick="showView('add-farm')"
+                                        class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-left font-semibold transition-all"
+                                    >
+                                        + Add New Farm
+                                    </button>
+                                    <button
+                                        class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-left font-semibold transition-all"
+                                    >
+                                        📊 View Analytics
+                                    </button>
+                                    <button
+                                        class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-left font-semibold transition-all"
+                                    >
+                                        💬 Post Update
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Performance Chart -->
+                            <div
+                                class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+                            >
+                                <h3 class="text-lg font-bold mb-4">
+                                    This Month
+                                </h3>
+                                <canvas id="performance-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Farms View -->
+                <div id="view-my-farms" class="view-content hidden">
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                    >
+                        <div
+                            class="p-6 border-b border-gray-200 dark:border-gray-700"
+                        >
+                            <div
+                                class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0"
+                            >
+                                <h2 class="text-xl font-bold">My Farms</h2>
+                                <div class="flex items-center space-x-4">
+                                    <input
+                                        type="search"
+                                        placeholder="Search farms..."
+                                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                    />
+                                    <button
+                                        onclick="showView('add-farm')"
+                                        class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all whitespace-nowrap"
+                                    >
+                                        + Add Farm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 dark:bg-gray-900">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase"
+                                        >
+                                            Farm Name
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase"
+                                        >
+                                            Token ID
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase"
+                                        >
+                                            Investors
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase"
+                                        >
+                                            Raised
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase"
+                                        >
+                                            Status
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase"
+                                        >
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    id="farms-table"
+                                    class="divide-y divide-gray-200 dark:divide-gray-700"
+                                >
+                                    <!-- Farms will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add New Farm View -->
+                <div id="view-add-farm" class="view-content hidden">
+                    <div class="max-w-4xl mx-auto">
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8"
+                        >
+                            <h2 class="text-2xl font-bold mb-6">
+                                Tokenize a New Farm
+                            </h2>
+                            <form id="add-farm-form" class="space-y-6">
+                                <!-- Farm Name -->
+                                <div>
+                                    <label
+                                        class="block text-sm font-semibold mb-2"
+                                        >Farm Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        placeholder="e.g., Green Valley Coffee Farm"
+                                        required
+                                    />
+                                </div>
+
+                                <!-- Image Upload -->
+                                <div>
+                                    <label
+                                        class="block text-sm font-semibold mb-2"
+                                        >Farm Image</label
+                                    >
+                                    <div
+                                        class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 transition-colors cursor-pointer"
+                                        onclick="document.getElementById('farm-image').click()"
+                                    >
+                                        <input
+                                            type="file"
+                                            id="farm-image"
+                                            name="image"
+                                            class="hidden"
+                                            accept="image/*"
+                                            onchange="previewImage(event)"
+                                        />
+                                        <div id="image-preview-container">
+                                            <svg
+                                                class="w-12 h-12 mx-auto mb-4 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                ></path>
+                                            </svg>
+                                            <p
+                                                class="text-gray-600 dark:text-gray-400"
+                                            >
+                                                Click to upload or drag and drop
+                                            </p>
+                                            <p
+                                                class="text-sm text-gray-500 mt-1"
+                                            >
+                                                PNG, JPG up to 10MB
+                                            </p>
+                                        </div>
+                                        <img
+                                            id="image-preview"
+                                            class="hidden max-h-64 mx-auto rounded-lg"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <!-- Farm Size -->
+                                    <div>
+                                        <label
+                                            class="block text-sm font-semibold mb-2"
+                                            >Farm Size (acres)</label
+                                        >
+                                        <input
+                                            type="number"
+                                            name="size"
+                                            class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            placeholder="100"
+                                            required
+                                        />
+                                    </div>
+
+                                    <!-- Crop Type -->
+                                    <div>
+                                        <label
+                                            class="block text-sm font-semibold mb-2"
+                                            >Crop Type</label
+                                        >
+                                        <select
+                                            name="crop_type"
+                                            class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            required
+                                        >
+                                            <option value="">
+                                                Select crop type
+                                            </option>
+                                            <option value="coffee">
+                                                Coffee
+                                            </option>
+                                            <option value="maize">Maize</option>
+                                            <option value="rice">Rice</option>
+                                            <option value="wheat">Wheat</option>
+                                            <option value="avocado">
+                                                Avocado
+                                            </option>
+                                            <option value="tea">Tea</option>
+                                            <option value="cocoa">Cocoa</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Location -->
+                                <div>
+                                    <label
+                                        class="block text-sm font-semibold mb-2"
+                                        >Location</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        placeholder="e.g., Nairobi, Kenya"
+                                        required
+                                    />
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        Enter city and country
+                                    </p>
+                                </div>
+
+                                <!-- Valuation -->
+                                <div>
+                                    <label
+                                        class="block text-sm font-semibold mb-2"
+                                        >Farm Valuation (USD)</label
+                                    >
+                                    <input
+                                        type="number"
+                                        name="valuation"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        placeholder="250000"
+                                        required
+                                    />
+                                </div>
+
+                                <!-- Description -->
+                                <div>
+                                    <label
+                                        class="block text-sm font-semibold mb-2"
+                                        >Description</label
+                                    >
+                                    <textarea
+                                        name="description"
+                                        rows="4"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        placeholder="Describe your farm, its history, and what makes it special..."
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div
+                                    class="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700"
+                                >
+                                    <button
+                                        type="button"
+                                        onclick="showView('my-farms')"
+                                        class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        id="tokenize-btn"
+                                        class="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold transition-all hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <span id="tokenize-text"
+                                            >🚀 Tokenize Farm</span
+                                        >
+                                        <span
+                                            id="tokenize-loading"
+                                            class="hidden"
+                                            >Processing...</span
+                                        >
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions View -->
+                <div id="view-transactions" class="view-content hidden">
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+                    >
+                        <h2 class="text-xl font-bold mb-6">All Transactions</h2>
+                        <div id="all-transactions" class="space-y-4">
+                            <!-- All transactions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Cookie helper functions
+            function setCookie(name, value, days) {
+                const expires = new Date();
+                expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+                document.cookie =
+                    name +
+                    "=" +
+                    encodeURIComponent(value) +
+                    ";expires=" +
+                    expires.toUTCString() +
+                    ";path=/;SameSite=Lax";
+            }
+
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(";");
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === " ") c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0)
+                        return decodeURIComponent(
+                            c.substring(nameEQ.length, c.length),
+                        );
+                }
+                return null;
+            }
+
+            function deleteCookie(name) {
+                document.cookie =
+                    name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+            }
+
+            // Dark mode
+            if (
+                window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches
+            ) {
+                document.documentElement.classList.add("dark");
+            }
+
+            // Auth check
+
+            const token = localStorage.getItem("bloomr_token");
+            const role = localStorage.getItem("bloomr_role");
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                // Check authentication
+                if (!token || role !== "farmer") {
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                }
+
+                // Select DOM elements
+                const walletBadge = document.getElementById("wallet-badge");
+                const walletSpan = document.getElementById(
+                    "wallet-address-short",
+                );
+                const userInitials = document.getElementById("user-initials");
+                const userName = document.getElementById("user-name");
+                const userEmail = document.getElementById("user-email");
+
+                try {
+                    // Fetch user data
+                    const response = await fetch("/api/me/", {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+
+                    if (!response.ok) throw new Error("Unauthorized");
+
+                    const data = await response.json();
+
+                    /* =========================
+                       Update User Section
+                    ========================== */
+                    // Remove pulse loaders
+                    document
+                        .getElementById("user-avatar")
+                        ?.classList.remove("animate-pulse");
+                    userName.classList.remove(
+                        "bg-gray-300",
+                        "dark:bg-gray-700",
+                        "text-transparent",
+                        "animate-pulse",
+                    );
+                    userEmail.classList.remove(
+                        "bg-gray-200",
+                        "dark:bg-gray-700",
+                        "text-transparent",
+                        "animate-pulse",
+                    );
+
+                    // Display initials
+                    const initials =
+                        (data.first_name?.[0] || "") +
+                        (data.last_name?.[0] || "");
+                    userInitials.textContent = initials.toUpperCase() || "U";
+                    userInitials.classList.remove("opacity-0");
+
+                    // Display name and email
+                    userName.textContent =
+                        `${data.first_name || ""} ${data.last_name || ""}`.trim() ||
+                        "Unnamed User";
+                    userEmail.textContent = data.email || "No email provided";
+
+                    /* =========================
+       Update Wallet Section
+    ========================== */
+                    /* ✅ WALLET INFO */
+                    walletBadge.classList.remove("animate-pulse");
+
+                    if (data.wallet_id) {
+                        const shortWallet = `${data.wallet_id.slice(0, 6)}...${data.wallet_id.slice(-4)}`;
+                        walletSpan.textContent = shortWallet;
+                        walletSpan.classList.remove(
+                            "bg-gray-200",
+                            "dark:bg-gray-700",
+                            "w-20",
+                            "h-3",
+                            "text-gray-400",
+                        );
+                    } else {
+                        walletSpan.textContent = "Not linked";
+                        walletSpan.classList.remove(
+                            "bg-gray-200",
+                            "dark:bg-gray-700",
+                            "w-20",
+                            "h-3",
+                        );
+                        walletSpan.classList.add("text-red-400");
+
+                        // ✨ Add "Connect Wallet" button
+                        const connectBtn = document.createElement("button");
+                        connectBtn.textContent = "Connect Wallet";
+                        connectBtn.className =
+                            "ml-2 px-3 py-1 bg-hedera-500 text-white rounded-md hover:bg-hedera-600 text-xs";
+                        walletBadge.appendChild(connectBtn);
+
+                        connectBtn.addEventListener("click", async () => {
+                            try {
+                                if (!window.ethereum) {
+                                    alert(
+                                        "MetaMask not found. Please install MetaMask to continue.",
+                                    );
+                                    return;
+                                }
+
+                                // 🦊 Request wallet connection
+                                const accounts = await window.ethereum.request({
+                                    method: "eth_requestAccounts",
+                                });
+                                const walletId = accounts[0];
+                                const short = `${walletId.slice(0, 6)}...${walletId.slice(-4)}`;
+                                walletSpan.textContent = short;
+                                connectBtn.remove();
+                                walletSpan.classList.remove("text-red-400");
+                                walletSpan.classList.add("text-green-500");
+
+                                // 💾 Update backend
+                                const update = await fetch(
+                                    "/api/update_wallet/",
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${token}`,
+                                        },
+                                        body: JSON.stringify({
+                                            wallet_id: walletId,
+                                        }),
+                                    },
+                                );
+
+                                if (!update.ok)
+                                    throw new Error("Failed to update wallet");
+                                console.log("Wallet updated successfully ✅");
+                            } catch (err) {
+                                console.error("Wallet connection failed:", err);
+                                alert(
+                                    "Failed to connect wallet. Please try again.",
+                                );
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error("User fetch failed:", error);
+                    localStorage.removeItem("bloomr_token");
+                    localStorage.removeItem("bloomr_role");
+                    window.location.href = "{% url 'login' %}";
+                }
+            });
+
+            // Toggle sidebar on mobile
+            function toggleSidebar() {
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.getElementById("overlay");
+                sidebar.classList.toggle("open");
+                overlay.classList.toggle("hidden");
+            }
+
+            // Show view
+            function showView(viewName) {
+                // Hide all views
+                document.querySelectorAll(".view-content").forEach((view) => {
+                    view.classList.add("hidden");
+                });
+
+                // Show selected view
+                document
+                    .getElementById("view-" + viewName)
+                    .classList.remove("hidden");
+
+                // Update page title
+                const titles = {
+                    overview: "Overview",
+                    "my-farms": "My Farms",
+                    "add-farm": "Add New Farm",
+                    transactions: "Transactions",
+                };
+                document.getElementById("page-title").textContent =
+                    titles[viewName] || "Dashboard";
+
+                // Update active sidebar link
+                document.querySelectorAll(".sidebar-link").forEach((link) => {
+                    link.classList.remove("active");
+                });
+                event.target.closest(".sidebar-link")?.classList.add("active");
+
+                // Close mobile sidebar
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+
+                // Load data for specific views
+                if (viewName === "my-farms") {
+                    loadFarms();
+                } else if (viewName === "overview") {
+                    loadTransactions();
+
+                }
+            }
+
+            // Logout
+            function logout() {
+                localStorage.removeItem("bloomr_role");
+                localStorage.removeItem("bloomr_token");
+
+                //deleteCookie('bloomr_wallet');
+                window.location.href = "{% url 'login' %}";
+                /*
+            const token = getCookie('bloomr_token');
+            if (token) {
+                fetch('/api/auth/token/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${token}`
+                    }
+                }).finally(() => {
+                    deleteCookie('bloomr_token');
+                    deleteCookie('bloomr_role');
+                    deleteCookie('bloomr_wallet');
+                    window.location.href = 'login.html';
+                });
+            }*/
+            }
+
+            // Load transactions from Hedera Mirror Node
+            async function loadTransactions() {
+                const container = document.getElementById("transactions-feed");
+
+                try {
+                    const walletAddress = getCookie("bloomr_wallet");
+                    // Fetch from Hedera Mirror Node API
+                    //const response = await fetch(`https://testnet.mirrornode.hedera.com/api/v1/transactions?account.id=0.0.6887166&limit=10`);
+                    //console.log(response)
+                    // Mock data for demo
+                    const mockTransactions = [
+                        {
+                            id: 1,
+                            type: "Investment",
+                            from: "0x1234...5678",
+                            amount: "$5,000",
+                            time: "2 hours ago",
+                            status: "completed",
+                        },
+                        {
+                            id: 2,
+                            type: "Token Created",
+                            from: "Hedera Network",
+                            amount: "Farm #3",
+                            time: "5 hours ago",
+                            status: "completed",
+                        },
+                        {
+                            id: 3,
+                            type: "Investment",
+                            from: "0x8765...4321",
+                            amount: "$3,500",
+                            time: "1 day ago",
+                            status: "completed",
+                        },
+                        {
+                            id: 4,
+                            type: "Withdrawal",
+                            from: "Your Wallet",
+                            amount: "$2,000",
+                            time: "2 days ago",
+                            status: "completed",
+                        },
+                        {
+                            id: 5,
+                            type: "Investment",
+                            from: "0x5555...9999",
+                            amount: "$7,500",
+                            time: "3 days ago",
+                            status: "completed",
+                        },
+                    ];
+
+                    container.innerHTML = mockTransactions
+                        .map(
+                            (tx) => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 ${tx.type === "Investment" ? "bg-green-100 dark:bg-green-900" : "bg-blue-100 dark:bg-blue-900"} rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 ${tx.type === "Investment" ? "text-green-600 dark:text-green-400" : "text-blue-600 dark:text-blue-400"}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold">${tx.type}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${tx.from}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold">${tx.amount}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">${tx.time}</p>
+                        </div>
+                    </div>
+                `,
+                        )
+                        .join("");
+                } catch (error) {
+                    container.innerHTML =
+                        '<p class="text-center text-gray-500 py-8">Failed to load transactions</p>';
+                }
+            }
+
+            async function loadFarms() {
+                const tbody = document.getElementById("farms-table");
+
+                try {
+                    const token = localStorage.getItem("bloomr_token");
+                    const response = await fetch("/api/farms/", {
+                        // Change to the correct endpoint for retrieving farms
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+
+                    const farms = await response.json(); // Use 'response' instead of 'farmResponse'
+                    console.log(farms);
+
+                    // Initialize counters
+                    let totalFarms = farms.length;
+                    let totalRaised = 0;
+                    let pendingApprovals = 0;
+                    let totalInvestors = 0; // Replace with actual data if available
+
+                    // Calculate totals
+                    farms.forEach((farm) => {
+                        // Convert raised amount to float and accumulate
+                        totalRaised += parseFloat(farm.raised);
+
+                        // Count pending approvals
+                        if (farm.status === "pending") {
+                            pendingApprovals++;
+                        }
+                    });
+                    document.getElementById("stat-farms").innerText =
+                        totalFarms;
+                    document.getElementById("stat-raised").innerText =
+                        `$${totalRaised.toFixed(2)}`; // Format to 2 decimal places
+                    document.getElementById("stat-pending").innerText =
+                        pendingApprovals;
+                    document.getElementById("stat-investors").innerText =
+                        totalInvestors;
+
+                        if (totalFarms > 0) {
+    document.getElementById("placeholder-farms").style.display = 'none';
+}
+if (totalRaised > 0) {
+    document.getElementById("placeholder-raised").style.display = 'none';
+}
+if (pendingApprovals > 0) {
+    document.getElementById("placeholder-pending").style.display = 'none';
+}
+if (totalInvestors > 0) {
+    document.getElementById("placeholder-investors").style.display = 'none';
+}
+
+
+                    // Display results
+                    console.log("Total Farms:", totalFarms);
+                    console.log("Total Raised: $", totalRaised.toFixed(2)); // Format to 2 decimal places
+                    console.log("Pending Approvals:", pendingApprovals);
+                    console.log("Total Investors:", totalInvestors);
+                    tbody.innerHTML = farms
+                        .map(
+                            (farm) => `
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center text-white font-bold">
+                            ${farm.name.charAt(0)}
+                        </div>
+                        <span class="font-semibold">${farm.name}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="font-mono text-sm">${farm.token_id}</span>
+                </td>
+                <td class="px-6 py-4">${farm.investors}</td>
+                <td class="px-6 py-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 w-24">
+                            <div class="bg-primary-500 h-2 rounded-full" style="width: ${(farm.raised / farm.valuation) * 100}%"></div> <!-- Adjust percentage -->
+                        </div>
+                        <span class="text-sm font-semibold">${farm.raised}%</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${farm.status === "active" ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400"}">
+                        ${farm.status}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <button onclick="viewFarmDetails(${farm.id})" class="text-primary-600 hover:text-primary-700 font-semibold">
+                        View Details →
+                    </button>
+                </td>
+            </tr>
+        `,
+                        )
+                        .join("");
+                } catch (error) {
+                    console.error("Error loading farms:", error); // Log the error for debugging
+                    tbody.innerHTML =
+                        '<tr><td colspan="6" class="text-center py-8 text-gray-500">Failed to load farms</td></tr>';
+                }
+            }
+            function viewFarmDetails(farmId) {
+                // Navigate to farm detail page (to be created)
+                window.location.href = `farm-detail.html?id=${farmId}`;
+            }
+
+            // Image preview
+            function previewImage(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById("image-preview").src =
+                            e.target.result;
+                        document
+                            .getElementById("image-preview")
+                            .classList.remove("hidden");
+                        document
+                            .getElementById("image-preview-container")
+                            .classList.add("hidden");
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            // Add farm form submission
+            document
+                .getElementById("add-farm-form")
+                .addEventListener("submit", async function (e) {
+                    e.preventDefault();
+
+                    const btn = document.getElementById("tokenize-btn");
+                    const btnText = document.getElementById("tokenize-text");
+                    const btnLoading =
+                        document.getElementById("tokenize-loading");
+
+                    btn.disabled = true;
+                    btnText.classList.add("hidden");
+                    btnLoading.classList.remove("hidden");
+
+                    try {
+                        const formData = new FormData(this);
+                        const token = localStorage.getItem("bloomr_token");
+
+                        // Step 1: Create farm in backend
+                        const farmResponse = await fetch("/api/farms/", {
+                            method: "POST",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                            body: formData,
+                        });
+
+                        if (!farmResponse.ok)
+                            throw new Error("Failed to create farm");
+
+                        const farmData = await farmResponse.json();
+
+                        // Step 2: Create Hedera token
+
+                        const tokenResponse = await fetch(
+                            "http://localhost:3000/api/token/create",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    //'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    tokenName: String(farmData.id), // Ensure this is a string
+                                    tokenSymbol: String(formData.get("name")), // Ensure this is a string
+                                    initialSupply: Math.floor(
+                                        formData.get("valuation") / 100,
+                                    ), // Should be a number
+                                }),
+                            },
+                        );
+
+                        if (!tokenResponse.ok)
+                            throw new Error("Failed to create token");
+
+                        const tokenData = await tokenResponse.json();
+
+                        // Success!
+                        showSuccessModal(
+                            tokenData.tokenId,
+                            tokenData.transaction_id,
+                        );
+                        const farmUpdateResponse = await fetch(
+                            `/api/farms/${farmData.id}/`,
+                            {
+                                method: "PATCH", // or 'PUT' depending on your API design
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${token}`, // Include if authentication is required
+                                },
+                                body: JSON.stringify({
+                                    token_id: tokenData.tokenId, // Update the farm's token_id
+                                }),
+                            },
+                        );
+
+                        if (!farmUpdateResponse.ok)
+                            throw new Error(
+                                "Failed to update farm with token ID",
+                            );
+
+                        const updatedFarmData = await farmUpdateResponse.json();
+                        console.log("Updated Farm:", updatedFarmData);
+
+                        this.reset();
+                    } catch (error) {
+                        showErrorModal(error.message);
+                    } finally {
+                        btn.disabled = false;
+                        btnText.classList.remove("hidden");
+                        btnLoading.classList.add("hidden");
+                    }
+                });
+
+            function showSuccessModal(tokenId, txId) {
+                // Create success modal (simplified)
+                const modal = document.createElement("div");
+                modal.className =
+                    "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4";
+                modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Farm Tokenized! 🎉</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Your farm has been successfully tokenized on Hedera</p>
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4 text-left">
+                            <p class="text-xs text-gray-500 mb-1">Token ID</p>
+                            <p class="font-mono text-sm font-semibold">${tokenId}</p>
+                        </div>
+                        <button onclick="this.closest('.fixed').remove(); showView('my-farms'); loadFarms();" class="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold">
+                            View My Farms
+                        </button>
+                    </div>
+                </div>
+            `;
+                document.body.appendChild(modal);
+            }
+
+            function showErrorModal(message) {
+                const modal = document.createElement("div");
+                modal.className =
+                    "fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg z-50";
+                modal.textContent = message;
+                document.body.appendChild(modal);
+                setTimeout(() => modal.remove(), 5000);
+            }
+
+            // Performance chart
+            const ctx = document.getElementById("performance-chart");
+            if (ctx) {
+                new Chart(ctx, {
+                    type: "doughnut",
+                    data: {
+                        labels: ["Investments", "Withdrawals", "Pending"],
+                        datasets: [
+                            {
+                                data: [65, 25, 10],
+                                backgroundColor: [
+                                    "#22c55e",
+                                    "#f59e0b",
+                                    "#6b7280",
+                                ],
+                                borderWidth: 0,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                            },
+                        },
+                    },
+                });
+            }
+
+            // Initialize
+            loadFarms();
+            loadTransactions();
+        </script>
+    </body>
+</html>

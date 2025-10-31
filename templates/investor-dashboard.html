@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Dashboard - Bloomr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        hedera: {
+                            500: '#5D5CDE',
+                            600: '#4B4ABD',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #22c55e 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-link {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            padding-left: 1.25rem;
+        }
+
+        .sidebar-link.active {
+            background: rgba(34, 197, 94, 0.15);
+            border-left: 4px solid #22c55e;
+            padding-left: 1.25rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+    <!-- Mobile Menu Overlay -->
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl z-50 overflow-y-auto">
+        <!-- Logo -->
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="flex items-center space-x-2">
+                <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-xl font-bold gradient-text">Bloomr</span>
+            </a>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Investor Dashboard</p>
+        </div>
+
+        <!-- User Info -->
+<div class="p-6 border-b border-gray-200 dark:border-gray-700">
+  <div class="flex items-center space-x-3">
+    <div
+      id="user-avatar"
+      class="w-12 h-12 bg-gradient-to-br from-accent-500 to-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg animate-pulse"
+    >
+      <span id="user-initials" class="opacity-0">--</span>
+    </div>
+    <div class="flex-1">
+      <p id="user-name" class="font-semibold text-sm text-transparent bg-gray-300 dark:bg-gray-700 rounded w-24 h-4  animate-pulse"></p>
+      <p id="user-email" class="text-xs text-transparent bg-gray-200 dark:bg-gray-700 rounded w-32 h-3 mt-1 animate-pulse"></p>
+    </div>
+  </div>
+</div>
+
+
+        <!-- Navigation -->
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300" onclick="showView('portfolio'); return false;">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <span>My Portfolio</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300" onclick="showView('discover'); return false;">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <span>Discover Farms</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300" onclick="showView('transactions'); return false;">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <span>Transactions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Logout -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="md:ml-64 min-h-screen">
+        <!-- Top Bar -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <h1 class="text-2xl font-bold" id="page-title">Discover Farms</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Wallet Badge -->
+<div
+  id="wallet-badge"
+  class="hidden md:flex items-center space-x-2 bg-hedera-500/20 border border-hedera-500 rounded-lg px-3 py-2 animate-pulse"
+>
+  <svg
+    class="w-5 h-5 text-hedera-500"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+    ></path>
+  </svg>
+
+  <!-- Placeholder (hidden after load) -->
+  <span
+    id="wallet-address-short"
+    class="text-xs font-mono text-gray-400 bg-gray-200 dark:bg-gray-700 rounded w-20 h-3 block"
+  ></span>
+</div>
+
+                    <!-- Notifications -->
+                    <button class="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="p-4 md:p-8">
+            <!-- My Portfolio View -->
+            <div id="view-portfolio" class="view-content hidden">
+                <!-- Portfolio Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1">Total Invested</h3>
+                        <p class="text-3xl font-bold" id="total-invested">$0</p>
+                        <p class="text-green-600 dark:text-green-400 text-sm mt-1">+$0 this month</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1">Current Value</h3>
+                        <p class="text-3xl font-bold" id="current-value">$0</p>
+                        <p class="text-green-600 dark:text-green-400 text-sm mt-1">+0% overall</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-accent-100 dark:bg-accent-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent-600 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1">Total Earnings</h3>
+                        <p class="text-3xl font-bold" id="total-earnings">$0</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Lifetime</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover-lift">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1">Active Farms</h3>
+                        <p class="text-3xl font-bold" id="active-farms">0</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">In portfolio</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- My Investments -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold">My Investments</h2>
+                                <button onclick="showWithdrawModal()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all">
+                                    💰 Withdraw Earnings
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50 dark:bg-gray-900">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Farm Name</th>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Tokens</th>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Value</th>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">ROI</th>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="portfolio-table" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        <!-- Portfolio items will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Growth Chart -->
+                    <div class="space-y-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Portfolio Growth</h3>
+                            <canvas id="growth-chart"></canvas>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl shadow-lg p-6 text-white">
+                            <h3 class="text-xl font-bold mb-4">Quick Actions</h3>
+                            <div class="space-y-3">
+                                <button onclick="showView('discover')" class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-left font-semibold transition-all">
+                                    🔍 Discover Farms
+                                </button>
+                                <button class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-left font-semibold transition-all">
+                                    📊 View Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discover Farms View -->
+            <div id="view-discover" class="view-content">
+                <!-- Filters -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-lg font-bold mb-4">Filter Farms</h2>
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Crop Type</label>
+                            <select id="filter-crop" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">All Crops</option>
+                                <option value="coffee">Coffee</option>
+                                <option value="maize">Maize</option>
+                                <option value="rice">Rice</option>
+                                <option value="wheat">Wheat</option>
+                                <option value="avocado">Avocado</option>
+                                <option value="tea">Tea</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Location</label>
+                            <select id="filter-location" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">All Locations</option>
+                                <option value="kenya">Kenya</option>
+                                <option value="tanzania">Tanzania</option>
+                                <option value="uganda">Uganda</option>
+                                <option value="ethiopia">Ethiopia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Min ROI (%)</label>
+                            <input type="number" id="filter-roi-min" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="15">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Max ROI (%)</label>
+                            <input type="number" id="filter-roi-max" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="40">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end space-x-3">
+                        <button onclick="clearFilters()" class="px-6 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700">
+                            Clear
+                        </button>
+                        <button onclick="applyFilters()" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Farms Grid -->
+                <div id="farms-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Farm cards will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Transactions View -->
+            <div id="view-transactions" class="view-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+
+                    <h2 class="text-xl font-bold mb-6">Transaction History</h2>
+                    <button onclick="loadTransactions()" class="mt-4 text-sm text-primary-600 hover:underline">↻ Refresh</button>
+
+                    <div id="transactions-list" class="space-y-4">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                    <!-- Pagination -->
+                    <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                            Previous
+                        </button>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Page 1 of 5</span>
+                        <button class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdraw-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <h3 class="text-2xl font-bold mb-6">Withdraw Earnings</h3>
+            <form id="withdraw-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Available Balance</label>
+                    <div class="text-3xl font-bold text-primary-600">$13,725</div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Amount to Withdraw</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="1000"
+                        max="13725"
+                        required
+                    >
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeWithdrawModal()" class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold">
+                        Withdraw
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+               // Cookie helpers
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
+        }
+
+        // Dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("bloomr_token");
+  const role = localStorage.getItem("bloomr_role");
+
+  // Check authentication
+  if (!token || role !== "investor") {
+    window.location.href = "{% url 'login' %}";
+    return;
+  }
+
+  // Select DOM elements
+  const walletBadge = document.getElementById("wallet-badge");
+  const walletSpan = document.getElementById("wallet-address-short");
+  const userInitials = document.getElementById("user-initials");
+  const userName = document.getElementById("user-name");
+  const userEmail = document.getElementById("user-email");
+
+  try {
+    // Fetch user data
+    const response = await fetch("/api/me/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error("Unauthorized");
+
+    const data = await response.json();
+
+    /* =========================
+       Update User Section
+    ========================== */
+    // Remove pulse loaders
+    document.getElementById("user-avatar")?.classList.remove("animate-pulse");
+    userName.classList.remove("bg-gray-300","dark:bg-gray-700" ,"text-transparent", "animate-pulse");
+    userEmail.classList.remove('bg-gray-200', 'dark:bg-gray-700', "text-transparent", "animate-pulse");
+
+    // Display initials
+    const initials = (data.first_name?.[0] || "") + (data.last_name?.[0] || "");
+    userInitials.textContent = initials.toUpperCase() || "U";
+    userInitials.classList.remove("opacity-0");
+
+    // Display name and email
+    userName.textContent = `${data.first_name || ""} ${data.last_name || ""}`.trim() || "Unnamed User";
+    userEmail.textContent = data.email || "No email provided";
+
+    /* =========================
+       Update Wallet Section
+    ========================== */
+     /* ✅ WALLET INFO */
+    walletBadge.classList.remove("animate-pulse");
+
+    if (data.wallet_id) {
+      const shortWallet = `${data.wallet_id.slice(0, 6)}...${data.wallet_id.slice(-4)}`;
+      walletSpan.textContent = shortWallet;
+      walletSpan.classList.remove("bg-gray-200", "dark:bg-gray-700", "w-20", "h-3", "text-gray-400");
+    } else {
+      walletSpan.textContent = "Not linked";
+      walletSpan.classList.remove("bg-gray-200", "dark:bg-gray-700", "w-20", "h-3");
+      walletSpan.classList.add("text-red-400");
+
+      // ✨ Add "Connect Wallet" button
+      const connectBtn = document.createElement("button");
+      connectBtn.textContent = "Connect Wallet";
+      connectBtn.className = "ml-2 px-3 py-1 bg-hedera-500 text-white rounded-md hover:bg-hedera-600 text-xs";
+      walletBadge.appendChild(connectBtn);
+
+      connectBtn.addEventListener("click", async () => {
+        try {
+          if (!window.ethereum) {
+            alert("MetaMask not found. Please install MetaMask to continue.");
+            return;
+          }
+
+          // 🦊 Request wallet connection
+          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+          const walletId = accounts[0];
+          const short = `${walletId.slice(0, 6)}...${walletId.slice(-4)}`;
+          walletSpan.textContent = short;
+          connectBtn.remove();
+          walletSpan.classList.remove("text-red-400");
+          walletSpan.classList.add("text-green-500");
+
+          // 💾 Update backend
+          const update = await fetch("/api/update_wallet/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({ wallet_id: walletId }),
+          });
+
+          if (!update.ok) throw new Error("Failed to update wallet");
+          console.log("Wallet updated successfully ✅");
+        } catch (err) {
+          console.error("Wallet connection failed:", err);
+          alert("Failed to connect wallet. Please try again.");
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error("User fetch failed:", error);
+    localStorage.removeItem("bloomr_token");
+    localStorage.removeItem("bloomr_role");
+    window.location.href = "{% url 'login' %}";
+  }
+    });
+            // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Show view
+        function showView(viewName) {
+            document.querySelectorAll('.view-content').forEach(view => {
+                view.classList.add('hidden');
+            });
+
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+
+            const titles = {
+                'portfolio': 'My Portfolio',
+                'discover': 'Discover Farms',
+                'transactions': 'Transactions'
+            };
+            document.getElementById('page-title').textContent = titles[viewName] || 'Dashboard';
+
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.sidebar-link')?.classList.add('active');
+
+            if (window.innerWidth < 768) {
+                toggleSidebar();
+            }
+
+            if (viewName === 'discover') {
+                loadFarms();
+            } else if (viewName === 'portfolio') {
+                loadPortfolio();
+            } else if (viewName === 'transactions') {
+                loadTransactions();
+            }
+        }
+
+        // Logout
+        function logout() {
+    
+            localStorage.removeItem("bloomr_role");
+            localStorage.removeItem("bloomr_token");
+
+            //deleteCookie('bloomr_wallet');
+             window.location.href = "{% url 'login' %}";
+        }
+
+
+async function loadFarms() {
+    const grid = document.getElementById('farms-grid');
+    const mockFarms = [
+        { id: 1, name: 'Green Valley Coffee', slug: 'green-valley-coffee', location: 'Kenya', crop: 'Coffee', roi: 28.5, price: 125, yield: '150 tons/year', image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=300&fit=crop', raised: 85 },
+        { id: 2, name: 'Sunrise Maize Farm', slug: 'sunrise-maize', location: 'Tanzania', crop: 'Maize', roi: 24.2, price: 89, yield: '200 tons/year', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', raised: 72 },
+        { id: 3, name: 'Victoria Rice Fields', slug: 'victoria-rice', location: 'Uganda', crop: 'Rice', roi: 22.8, price: 156, yield: '180 tons/year', image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=400&h=300&fit=crop', raised: 60 },
+        { id: 4, name: 'Kilimanjaro Avocado', slug: 'kilimanjaro-avocado', location: 'Kenya', crop: 'Avocado', roi: 21.5, price: 198, yield: '120 tons/year', image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=400&h=300&fit=crop', raised: 45 },
+        { id: 5, name: 'Highland Tea Estate', slug: 'highland-tea', location: 'Kenya', crop: 'Tea', roi: 20.1, price: 142, yield: '95 tons/year', image: 'https://images.unsplash.com/photo-1474440692490-2e83ae13ba29?w=400&h=300&fit=crop', raised: 90 },
+        { id: 6, name: 'Zambezi Wheat Farm', slug: 'zambezi-wheat', location: 'Tanzania', crop: 'Wheat', roi: 19.7, price: 95, yield: '220 tons/year', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', raised: 55 }
+    ];
+
+    try {
+        const token = localStorage.getItem("bloomr_token");
+        const response = await fetch("/api/farms/");
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const farms = await response.json();
+        renderFarms(farms); // Render fetched farms
+
+    } catch (error) {
+        console.error("Error loading farms:", error);
+        renderFarms(mockFarms); // Render mock farms on error
+    }
+}
+
+function renderFarms(farms) {
+    const grid = document.getElementById('farms-grid');
+    grid.innerHTML = farms.map(farm => `
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover-lift cursor-pointer" onclick="viewFarm('${farm.id}')">
+            <div class="relative h-48">
+                <img src="${farm.image}" alt="${farm.name}" class="w-full h-full object-cover">
+                <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    +${farm.roi}% ROI
+                </div>
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2">${farm.name}</h3>
+                <div class="flex items-center text-gray-600 dark:text-gray-400 text-sm mb-4">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
+                    ${farm.location}
+                    <span class="mx-2">•</span>
+                    <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded text-xs font-semibold">
+                        ${farm.crop}
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Token Price</div>
+                        <div class="text-lg font-bold">$${farm.price}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Yield</div>
+                        <div class="text-lg font-bold">${farm.yield}</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-500 dark:text-gray-400">Funded</span>
+                        <span class="font-semibold">${farm.raised}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-primary-500 h-2 rounded-full" style="width: ${farm.raised}%"></div>
+                    </div>
+                </div>
+                <button class="w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-all">
+                    View Details
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+        function viewFarm(slug) {
+            window.location.href = `/investor-farm-detail/${slug}/`;
+        }
+
+        // Load portfolio
+        async function loadPortfolio() {
+            const tbody = document.getElementById('portfolio-table');
+
+            const mockPortfolio = [
+                { farm: 'Green Valley Coffee', tokens: 50, invested: 6250, currentValue: 7850, roi: 25.6 },
+                { farm: 'Sunrise Maize Farm', tokens: 120, invested: 10680, currentValue: 13260, roi: 24.2 },
+                { farm: 'Victoria Rice Fields', tokens: 35, invested: 5460, currentValue: 6705, roi: 22.8 },
+                { farm: 'Highland Tea Estate', tokens: 80, invested: 11360, currentValue: 13640, roi: 20.1 },
+                { farm: 'Kilimanjaro Avocado', tokens: 25, invested: 4950, currentValue: 6015, roi: 21.5 }
+            ];
+
+            tbody.innerHTML = mockPortfolio.map(item => `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-6 py-4 font-semibold">${item.farm}</td>
+                    <td class="px-6 py-4">${item.tokens}</td>
+                    <td class="px-6 py-4 font-semibold">$${item.currentValue.toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full text-sm font-semibold">
+                            +${item.roi}%
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button class="text-primary-600 hover:text-primary-700 font-semibold">
+                            View →
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            initGrowthChart();
+        }
+
+        // Load transactions
+      
+async function loadTransactions() {
+  const container = document.getElementById("transactions-list");
+  const token = localStorage.getItem("bloomr_token");
+
+  // 🔹 Show loading skeleton
+  container.innerHTML = `
+    <div class="text-center py-8 animate-pulse">
+      <p class="text-gray-500 dark:text-gray-400">Loading transactions...</p>
+    </div>
+  `;
+
+  try {
+    const response = await fetch("/app/api/transactions/", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch transactions");
+    }
+
+    const data = await response.json();
+
+    if (!data.length) {
+      container.innerHTML = `
+        <div class="text-center py-10">
+          <div class="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+            <i class="fas fa-box-open text-gray-400 text-2xl"></i>
+          </div>
+          <p class="text-gray-500 dark:text-gray-400 mt-3 font-medium">No transactions found yet</p>
+          <p class="text-sm text-gray-400">Start investing to see your activity here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // 🔹 Render transactions dynamically
+    container.innerHTML = data.map(tx => `
+      <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-all duration-300">
+        <div class="flex items-center space-x-4 flex-1">
+          <div class="w-10 h-10 ${
+            tx.type === 'purchase'
+              ? 'bg-blue-100 dark:bg-blue-900/40'
+              : tx.type === 'earning'
+              ? 'bg-green-100 dark:bg-green-900/40'
+              : 'bg-yellow-100 dark:bg-yellow-900/40'
+          } rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 ${
+              tx.type === 'purchase'
+                ? 'text-blue-600 dark:text-blue-400'
+                : tx.type === 'earning'
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-yellow-600 dark:text-yellow-400'
+            }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
+                tx.type === 'purchase'
+                  ? 'M12 4v16m8-8H4'
+                  : 'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4'
+              }"></path>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold capitalize">${tx.type}${tx.farm_name ? ` - ${tx.farm_name}` : ''}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${new Date(tx.timestamp).toLocaleString()}</p>
+            ${
+              tx.tx_hash
+                ? `<a href="https://hashscan.io/testnet/transaction/${tx.tx_hash}" target="_blank" class="text-xs text-primary-600 hover:text-primary-700 font-mono">
+                    ${tx.tx_hash.slice(0, 15)}... ↗
+                   </a>`
+                : ''
+            }
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="font-bold">${tx.amount_usd ? `$${tx.amount_usd}` : '—'}</p>
+          ${tx.tokens ? `<p class="text-sm text-gray-500 dark:text-gray-400">${tx.tokens} tokens</p>` : ''}
+        </div>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    console.error("❌ Transaction fetch failed:", error);
+    container.innerHTML = `
+      <div class="text-center py-10">
+        <div class="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+          <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+        </div>
+        <p class="text-red-500 font-medium mt-3">Failed to load transactions.</p>
+        <p class="text-sm text-gray-400">Please check your connection and try again.</p>
+      </div>
+    `;
+  }
+}
+
+// Auto-run when page loads
+document.addEventListener("DOMContentLoaded", loadTransactions);
+
+        // Filter functions
+        function clearFilters() {
+            document.getElementById('filter-crop').value = '';
+            document.getElementById('filter-location').value = '';
+            document.getElementById('filter-roi-min').value = '';
+            document.getElementById('filter-roi-max').value = '';
+            loadFarms();
+        }
+
+        function applyFilters() {
+            // Filter logic would go here
+            loadFarms();
+        }
+
+        // Withdraw modal
+        function showWithdrawModal() {
+            document.getElementById('withdraw-modal').classList.remove('hidden');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdraw-modal').classList.add('hidden');
+        }
+
+        document.getElementById('withdraw-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const amount = this.elements.amount.value;
+
+            try {
+                const response = await fetch('/api/withdraw/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${getCookie('bloomr_token')}`
+                    },
+                    body: JSON.stringify({ amount })
+                });
+
+                if (response.ok) {
+                    closeWithdrawModal();
+                    const msg = document.createElement('div');
+                    msg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                    msg.textContent = 'Withdrawal successful!';
+                    document.body.appendChild(msg);
+                    setTimeout(() => msg.remove(), 3000);
+                }
+            } catch (error) {
+                const msg = document.createElement('div');
+                msg.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                msg.textContent = 'Withdrawal failed';
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 3000);
+            }
+        });
+
+        // Growth chart
+        function initGrowthChart() {
+            const ctx = document.getElementById('growth-chart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: [35000, 38500, 42000, 46500, 52000, 58725],
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + (value/1000) + 'K';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        loadFarms();
+    </script>
+</body>
+</html>
